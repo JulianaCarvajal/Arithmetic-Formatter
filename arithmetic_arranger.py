@@ -1,39 +1,52 @@
-def arithmetic_arranger(problems, ans=False):
+def arithmetic_arranger(problems: list, ans: bool= False) -> str:
     if len(problems) > 5:
         return 'Error: Too many problems.'
-
+    
     dict_lines = {}
-    separate_problems = []
-    for i in range(len(problems)):                    
-        separate_problems = problems[i].split(" ")
-        if separate_problems[1] not in "+-":
-            return "Error: Operator must be '+' or '-'."
-        if len(separate_problems[0]) > 4 or len(separate_problems[2]) > 4:
-            return 'Error: Numbers cannot be more than four digits.'
-        if separate_problems[0].isdigit() and separate_problems[2].isdigit():
-            answer = str(eval(problems[i]))
-            if len(separate_problems[0]) < len(separate_problems[2]):
-                total_length = len(separate_problems[2]) + 2
-            else:
-                total_length = len(separate_problems[0]) + 2
-            first_line = ' '*(total_length-len(separate_problems[0])) + separate_problems[0]
-            second_line = separate_problems[1] + ' '*(total_length-len(separate_problems[2])-1) + separate_problems[2]
-            dashes = '-'*total_length            
-            answer = ' '*(total_length-len(answer)) + answer
-            dict_lines[i] = [first_line, second_line, dashes, answer]
-            
-        else:
-            return 'Error: Numbers must only contain digits.'
+    for problem in range(len(problems)):                    
+        problem_components = problems[problem].split(" ")
+        num1 = problem_components[0]
+        operator = problem_components[1]
+        num2 = problem_components[2]
+        if check_errors(num1, operator, num2):
+            return check_errors(num1, operator, num2)
         
+        answer = str(eval(problems[problem]))
+        dict_lines[problem] = problem_solver(num1, operator, num2, answer)   
+    
+    return problems_arranger(problems, dict_lines, ans)
+
+def check_errors(num1: str, operator: str, num2: str):
+    if operator not in "+-":
+        return "Error: Operator must be '+' or '-'."        
+    if len(num1) > 4 or len(num2) > 4:
+        return 'Error: Numbers cannot be more than four digits.'
+    if not num1.isdigit() or not num2.isdigit():
+        return 'Error: Numbers must only contain digits.'
+
+def problem_solver(num1: str, operator: str, num2: str, answer: str) -> list:
+    if len(num1) < len(num2):
+        total_length = len(num2) + 2
+    else:
+        total_length = len(num1) + 2
+    first_line = ' '*(total_length-len(num1)) + num1
+    second_line = operator + ' '*(total_length-len(num2)-1) + num2
+    dashes = '-'*total_length            
+    answer = ' '*(total_length-len(answer)) + answer
+    
+    return [first_line, second_line, dashes, answer]
+
+def problems_arranger(problems: list, dict_lines: dict, ans: bool) -> str:
     arranged_problems = ''
-    for i in range(4):
-        for j in range(len(problems)):
-            if j == len(problems) - 1:
-                arranged_problems += dict_lines[j][i]
+    for line in range(4):
+        for problem in range(len(problems)):
+            if problem == len(problems) - 1:
+                arranged_problems += dict_lines[problem][line]
             else:
-                arranged_problems += dict_lines[j][i] + '    '
-        if ans == False and i == 2:
+                arranged_problems += dict_lines[problem][line] + '    '
+        if ans == False and line == 2:
             break
-        if i != 3:
+        if line != 3:
             arranged_problems += '\n'
+            
     return arranged_problems
